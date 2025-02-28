@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Team Bearable',
-  description: '학생부 분석 서비스 입니다.',
+  title: 'Example',
+  description: 'Example',
 };
 
 export default function RootLayout({
