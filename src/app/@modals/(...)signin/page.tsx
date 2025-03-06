@@ -21,7 +21,7 @@ export default function SignInModal() {
     return null;
   }
   return (
-    <Modal>
+    <Modal isPage>
       <SignInForm />
     </Modal>
   );

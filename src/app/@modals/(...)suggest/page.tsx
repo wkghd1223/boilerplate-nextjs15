@@ -3,7 +3,7 @@ import Modal from '@/components/ui/modal';
 
 export default function SuggestModal() {
   return (
-    <Modal>
+    <Modal isPage>
       <GunHee />
     </Modal>
   );

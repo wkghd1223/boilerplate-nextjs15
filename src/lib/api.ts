@@ -94,12 +94,14 @@ serverApi.interceptors.request.use(
     // import 로 가져오면 client단에서는 server용 코드 못넣는다고 오류를 뱉어내서
     // require로 승부
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { cookies } = require('next/headers');
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('access-token')?.value;
-    // accessToken이 쿠키에 있으면 axios 쏘기 전에 헤더에 담아서 보낸다.
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    if (!config.headers.Authorization) {
+      const { cookies } = require('next/headers');
+      const cookieStore = await cookies();
+      const accessToken = cookieStore.get('access-token')?.value;
+      // accessToken이 쿠키에 있으면 axios 쏘기 전에 헤더에 담아서 보낸다.
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
     }
     return config;
   },
@@ -119,15 +121,25 @@ serverApi.interceptors.response.use(
       try {
         // 프론트서버 /api/auth/refresh 호출
         // 서버코드(노드환경)에서 FRONT_URL 안넣어주면 에러 먹뱉
+        const { cookies } = require('next/headers');
+        const cookieStore = await cookies();
+        const accessToken = cookieStore.get('access-token')?.value;
+        const refreshToken = cookieStore.get('refresh-token')?.value;
         const res = await fetch(`${FRONT_URL}/api/auth/refresh`, {
           method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            Cookie: `access-token=${accessToken};refresh-token=${refreshToken}`,
+          },
         });
         const { token } = (await res.json()) as unknown as TokenResponseType;
         // accessToken를 정상적으로 받아왔으면 헤더에 담아서 다시 요청보낸다.
-        const accessToken = token?.accessToken;
-        if (accessToken) {
-          response.config.headers.Authorization = `Bearer ${accessToken}`;
-          return serverApi(response.config); // 🔄 Retry request with new token
+        if (token) {
+          const accessToken = token?.accessToken;
+          if (accessToken) {
+            response.config.headers.Authorization = `Bearer ${accessToken}`;
+            return serverApi(response.config); // 🔄 Retry request with new token
+          }
         }
       } catch (err) {
         console.error('Token refresh failed', err);

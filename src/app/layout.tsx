@@ -15,17 +15,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Example',
-  description: 'Example',
+  title: 'BOILER',
+  description: 'BOILER PLATE',
 };
 
 export default function RootLayout({
   modals,
-  auth,
   children,
 }: Readonly<{
   modals: React.ReactNode;
-  auth: React.ReactNode;
   children: React.ReactNode;
 }>) {
   return (
@@ -34,7 +32,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {modals}
-        {auth}
         <Header />
         {children}
         <Footer />
